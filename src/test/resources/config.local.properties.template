@@ -1,0 +1,19 @@
+# ============================================================
+# Self-Healing Locator Engine - Local Credentials TEMPLATE
+#
+# Copy this file to config.local.properties and fill in the values:
+#
+#   cp src/test/resources/config.local.properties.template \
+#      src/test/resources/config.local.properties
+#
+# config.local.properties is gitignored. Never commit real credentials.
+#
+# CI alternative — set these instead of creating the file:
+#   VALID_EMAIL, VALID_PASSWORD
+#
+# Anything in config.properties can also be overridden here, e.g.
+#   headless=true
+# ============================================================
+
+valid.email=
+valid.password=

@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+
+<suite name="Self-Healing Locator Engine Automation Suite" verbose="2" parallel="false" preserve-order="true">
+
+    <!--
+      HealingListener is not listed: it registers itself through META-INF/services,
+      so runs that bypass this file (mvn test -Dtest=...) still save healing history.
+    -->
+    <listeners>
+        <listener class-name="com.portfolio.selfhealing.listeners.AllureListener"/>
+        <listener class-name="com.portfolio.selfhealing.listeners.RetryListener"/>
+    </listeners>
+
+    <!--
+      Self-healing engine - offline. Scoring, safety rules and history, plus real
+      browser fixtures rendered with page.setContent(). No live site, no logins,
+      no credits; runs first because it is fast and independent of the server.
+    -->
+    <test name="Healing Engine" enabled="true">
+        <groups>
+            <run>
+                <include name="healing"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.portfolio.selfhealing.healing.core.SimilarityScorerTest"/>
+            <class name="com.portfolio.selfhealing.healing.core.SafetyGuardTest"/>
+            <class name="com.portfolio.selfhealing.healing.core.SelectorHintsTest"/>
+            <class name="com.portfolio.selfhealing.healing.core.JsonHealingStoreTest"/>
+            <class name="com.portfolio.selfhealing.healing.core.HealingEngineTest"/>
+            <class name="com.portfolio.selfhealing.healing.SelfHealingFixtureTest"/>
+        </classes>
+    </test>
+
+    <!-- Smoke Tests - Critical Path Only -->
+    <test name="Smoke Tests" enabled="true">
+        <groups>
+            <run>
+                <include name="smoke"/>
+            </run>
+        </groups>
+        <!--
+          LoginTest runs LAST on purpose. Sign-in is server-throttled, and this
+          class authenticates on almost every method and signs out at the end,
+          revoking the session the other classes share. First in the list, it
+          starves everything after it and they fail on the throttle instead of
+          on their own assertions.
+        -->
+        <classes>
+            <class name="com.portfolio.selfhealing.tests.NoTokenTest"/>
+            <class name="com.portfolio.selfhealing.tests.DashboardTest"/>
+            <class name="com.portfolio.selfhealing.tests.AiToolsTest"/>
+            <class name="com.portfolio.selfhealing.tests.HistoryTest"/>
+            <class name="com.portfolio.selfhealing.tests.RegenerateTest"/>
+            <class name="com.portfolio.selfhealing.tests.LoginTest"/>
+        </classes>
+    </test>
+
+    <!-- Regenerate - Regenerate Image available on every design image. No credits. -->
+    <test name="Regenerate" enabled="true">
+        <groups>
+            <run>
+                <include name="regenerate"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.portfolio.selfhealing.tests.RegenerateTest"/>
+        </classes>
+    </test>
+
+    <!-- History - panel, redirect-to-screen, filter and search. No credits. -->
+    <test name="History" enabled="true">
+        <groups>
+            <run>
+                <include name="history"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.portfolio.selfhealing.tests.HistoryTest"/>
+        </classes>
+    </test>
+
+    <!-- AI Tools - UI coverage for all seven tools. Spends no credits. -->
+    <test name="AI Tools" enabled="true">
+        <groups>
+            <run>
+                <include name="tools"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.portfolio.selfhealing.tests.AiToolsTest"/>
+        </classes>
+    </test>
+
+    <!-- Help Center - public routes, no login, no credits. -->
+    <test name="Help Center" enabled="true">
+        <groups>
+            <run>
+                <include name="help"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.portfolio.selfhealing.tests.HelpCenterTest"/>
+        </classes>
+    </test>
+
+    <!--
+      Defects - regression cover for reported bugs. These assert the FIXED
+      behaviour, so a red test here means the defect is still open. Kept out of
+      the smoke suite deliberately: open defects would otherwise mask a genuine
+      regression elsewhere.
+
+      Credit-spending members of this group (CreditUsageTest, the video
+      generation case) are also in the "generation" group and are excluded
+      below, so this block itself spends nothing. Run those deliberately:
+        mvn test -Dtest=CreditUsageTest
+        mvn test -Dtest=VideoProcessingTest -Dgroups=generation
+    -->
+    <test name="Defects" enabled="true">
+        <groups>
+            <run>
+                <include name="defects"/>
+                <exclude name="generation"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.portfolio.selfhealing.tests.HelpCenterTest"/>
+            <class name="com.portfolio.selfhealing.tests.CreditUsageTest"/>
+            <class name="com.portfolio.selfhealing.tests.VideoProcessingTest"/>
+            <!-- Signs out; keep it after the session-based classes. -->
+            <class name="com.portfolio.selfhealing.tests.LoginTest"/>
+        </classes>
+    </test>
+
+    <!-- Regression Tests - Full Suite -->
+    <test name="Regression Tests" enabled="false">
+        <classes>
+            <class name="com.portfolio.selfhealing.tests.LoginTest"/>
+            <class name="com.portfolio.selfhealing.tests.DashboardTest"/>
+            <class name="com.portfolio.selfhealing.tests.AiToolsTest"/>
+            <class name="com.portfolio.selfhealing.tests.HistoryTest"/>
+            <class name="com.portfolio.selfhealing.tests.NoTokenTest"/>
+            <class name="com.portfolio.selfhealing.tests.RegenerateTest"/>
+        </classes>
+    </test>
+
+    <!--
+      Generation - SPENDS REAL CREDITS. Deliberately disabled.
+      Run with: mvn test -Dtest=AiGenerationTest [-Dgeneration.all=true]
+    -->
+    <test name="AI Generation" enabled="false">
+        <groups>
+            <run>
+                <include name="generation"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.portfolio.selfhealing.tests.AiGenerationTest"/>
+        </classes>
+    </test>
+
+</suite>

@@ -1,0 +1,16 @@
+target/
+.idea/
+*.iml
+src/test/resources/config.properties
+src/test/resources/config.local.properties
+src/test/resources/config.properties
+src/test/resources/pure-unit.xml
+healing/locator-history.json
+healing/*.tmp
+healing/*.corrupt
+allure-results/
+allure-report/
+screenshots/
+videos/
+.DS_Store
+Thumbs.db

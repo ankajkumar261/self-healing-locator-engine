@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Healing fixture: sign-in</title>
+<style>
+  body { font-family: sans-serif; margin: 0; }
+  .landing-nav { display: flex; justify-content: space-between; align-items: center; height: 56px; padding: 0 24px; }
+  .auth-modal { position: absolute; top: 120px; left: 600px; width: 420px; padding: 24px; border: 1px solid #ccc; }
+  .auth-view__form { display: flex; flex-direction: column; gap: 12px; }
+  .auth-view__field { display: flex; flex-direction: column; }
+  .auth-view__error, .auth-view__notice { color: #b00020; }
+</style>
+<script>
+  // Records which control a click landed on, so a test can prove a heal hit the right one.
+  window.__clicked = null;
+  document.addEventListener('click', e => {
+    const target = e.target.closest('[data-k]');
+    window.__clicked = target ? target.dataset.k : 'elsewhere';
+  });
+</script>
+</head>
+<body>
+<nav class="landing-nav">
+  <button type="button" class="landing-nav__brand" data-k="brand">ProTool</button>
+  <a class="nav-login" href="#sign-in" data-k="nav-sign-in">Sign in</a>
+</nav>
+<div class="auth-modal">
+  <div class="auth-view">
+    <h2 class="auth-view__title">Welcome back</h2>
+    <!-- banner -->
+    <form class="auth-view__form" onsubmit="return false">
+      <div class="auth-view__field">
+        <label for="auth-email">Email</label>
+        <input id="auth-email" class="auth-view__input" type="email" name="email" placeholder="Email address">
+      </div>
+      <div class="auth-view__field">
+        <label for="auth-password">Password</label>
+        <input id="auth-password" class="auth-view__input" type="password" name="password" placeholder="Password">
+      </div>
+      <div class="auth-view__forgot-row">
+        <button type="button" class="auth-view__link" data-k="forgot">Forgot password?</button>
+      </div>
+      <button type="submit" class="auth-view__submit" data-k="submit">Sign in</button>
+    </form>
+  </div>
+</div>
+</body>
+</html>
